@@ -18,7 +18,8 @@ class ValidationService implements ValidationInterface
         Client $client,
         string $endpoint,
         string $model
-    ) {
+    )
+    {
         $this->client = $client;
         $this->endpoint = $endpoint;
         $this->model = $model;
@@ -81,21 +82,33 @@ class ValidationService implements ValidationInterface
     {
         $content = trim($content);
 
-        if (preg_match('/```json\s*(.*?)\s*```/s', $content, $matches)) {
-            $content = $matches[1];
+        // Tenta decodificar diretamente primeiro
+        try {
+            return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            // Continua o processamento se falhar
         }
-        else {
-            preg_match('/\{(?:[^{}]|(?R))*\}/sx', $content, $matches);
+
+        // Extrai de blocos Markdown
+        if (preg_match('/```json\s*({[\s\S]*?})\s*```/', $content, $matches)) {
+            $content = $matches[1];
+        } else {
+            // Captura o maior objeto JSON possível
+            preg_match('/\{[\s\S]*\}/', $content, $matches);
             $content = $matches[0] ?? $content;
         }
 
-        $content = str_replace(['\\"', '\n'], ['"', PHP_EOL], $content);
-
-        $content = preg_replace('/\b(\d{1,2})\b(?=\s*meses)/u', '{{NÚMERO_EXTENSO}}', $content);
+        // Aplica substituição numérica apenas em contexto de texto
+        $content = preg_replace(
+            '/"([^"]*?)\b(\d{1,2})\b(?=\s*meses)([^"]*?)"/u',
+            '"$1{{NÚMERO_EXTENSO}}$3"',
+            $content
+        );
 
         try {
             return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
+            error_log('JSON inválido: ' . $content); // Debug
             throw new RuntimeException('Nenhum JSON válido encontrado');
         }
     }
