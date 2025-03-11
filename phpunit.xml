@@ -1,0 +1,12 @@
+<phpunit bootstrap="vendor/autoload.php">
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <server name="APP_ENV" value="testing"/>
+        <server name="DEEPSEEK_ENDPOINT" value="mock://api"/>
+        <server name="DEEPSEEK_MODEL" value="test-model"/>
+    </php>
+</phpunit>
