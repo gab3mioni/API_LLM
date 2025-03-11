@@ -1,0 +1,24 @@
+{
+    "name": "gab3mioni/api_llm",
+    "description": "API para validação e correção de templates de WhatsApp via LLM",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Gab3mioni\\ApiLlm\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "gab3mioni"
+        }
+    ],
+    "require": {
+        "slim/slim": "^4.14",
+        "symfony/dotenv": "^7.2",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0"
+    }
+}
