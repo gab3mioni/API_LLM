@@ -45,7 +45,7 @@ class ValidationService implements ValidationInterface
                     'stream' => false,
                     'options' => ['temperature' => 0.1]
                 ],
-                'timeout' => 240
+                'timeout' => $_ENV['TIMEOUT_LIMIT']
             ]);
 
             return $this->processResponse($response->getBody()->getContents());
