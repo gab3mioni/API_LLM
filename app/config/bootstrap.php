@@ -23,7 +23,7 @@ $containerBuilder->addDefinitions([
     Client::class => function () {
         return new Client([
             'verify' => false,
-            'timeout' => 120
+            'timeout' => 240
         ]);
     },
     ValidationInterface::class => function (Container $c) {
