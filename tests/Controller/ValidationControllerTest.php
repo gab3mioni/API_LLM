@@ -1,5 +1,7 @@
 <?php
 
+namespace Gab3mioni\ApiLlm\Tests\Controller;
+
 use PHPUnit\Framework\TestCase;
 use Gab3mioni\ApiLlm\Controllers\ValidationController;
 use Gab3mioni\ApiLlm\Interface\ValidationInterface;
