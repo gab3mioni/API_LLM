@@ -11,19 +11,19 @@ use GuzzleHttp\Client;
 use Slim\Factory\AppFactory;
 use Symfony\Component\Dotenv\Dotenv;
 
-set_time_limit(240);
-
 require __DIR__ . '/../../vendor/autoload.php';
 
 $dotenv = new Dotenv();
 $dotenv->loadEnv(__DIR__ . '/../../.env');
+
+set_time_limit((int)$_ENV['TIMEOUT_LIMIT']);
 
 $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions([
     Client::class => function () {
         return new Client([
             'verify' => false,
-            'timeout' => 240
+            'timeout' => $_ENV
         ]);
     },
     ValidationInterface::class => function (Container $c) {
