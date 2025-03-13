@@ -59,7 +59,40 @@ class ValidationService implements ValidationInterface
 
     private function generatePrompt(string $message): string
     {
-        return "Analise a seguinte mensagem para correções ortográficas, gramaticais e validação de compliance. Não é necessario ajustar termos técnicos. Siga estas etapas CRITICAMENTE:\n\n1. Verifique erros de português \n2. Identifique elementos de marketing\n3. Avalie uso de emojis conforme diretrizes\n4. Mantenha variáveis e elementos válidos\n5. Liste TODOS os erros encontrados\n6. Explique detalhadamente cada correção\n\nMensagem: \"$message\"\n\n**Regras de Validação:**\n- Emojis permitidos (máx 3): ★✨✓➡️🩺📅 (manter relevância médica)\n- Proibidos: 🛒🎉🤑💲🚨 (evitar tom comercial/alegre)\n- Variáveis devem manter formato {{nome}}\n- Proibir qualquer menção a preços/descontos\n- Termos técnicos com ® devem ser preservados\n\n**Formato de Resposta EXIGIDO (JSON):**\n{\n  \"valido\": <bool>,\n  \"erros\": [\"erro1\", \"erro2\", ...],\n  \"explicacao\": \"1. [erro1] explicação\\n2. [erro2] explicação\\n...\",\n  \"mensagem_sugerida\": \"texto com TODAS correções aplicadas\"\n}\n\n**Exemplo Completo:**\nMensagem: \"🌟{{Nome}}, Pantogar® está com SUPER desconto! 😍 Compre já 🛒\"\nResposta:\n{\n  \"valido\": false,\n  \"erros\": [\"marketing\", \"emoji_inadequado\", \"formato_variavel\", \"ortografia\"],\n  \"explicacao\": \"1. [marketing] Menção a 'SUPER desconto'\\n2. [emoji_inadequado] 😍🛒 removidos por tom comercial\\n3. [formato_variavel] {{Nome}} → {{nome}}\\n4. [ortografia] 'SUPER' em caixa alta desnecessária\",\n  \"mensagem_sugerida\": \"🌟 {{nome}}, Pantogar® está disponível para continuidade do seu tratamento.\"\n}";
+        return "Analise a seguinte mensagem para correções ortográficas, gramaticais e validação de compliance. Siga estas etapas CRITICAMENTE:
+
+1. Verifique erros de português
+2. Identifique elementos de marketing e converta para teor utilitário
+3. Avalie uso de emojis conforme diretrizes
+4. Preserve variáveis nos formatos: {{nome}}, {nome} ou #usuario.APELIDO
+5. Liste TODOS os erros encontrados
+
+Mensagem: \"$message\"
+
+**Regras de Validação:**
+- Emojis proibidos: 🛒🎉🤑💲🚨 (tom comercial)
+- Variáveis válidas: {{var}}, {var}, #usuario.APELIDO
+- Números devem permanecer como algarismos (ex: 3, nunca três ou {{NÚMERO_EXTENSO}})
+- Proibir menções a preços/descontos/condições comerciais
+- Termos técnicos com ® devem ser preservados
+- Tom médico-profissional obrigatório
+
+**Formato de Resposta EXIGIDO (JSON):**
+{
+  \"valido\": <bool>,
+  \"erros\": [\"erro1\", \"erro2\", ...],
+  \"explicacao\": \"1. [erro1] explicação\\n2. [erro2] explicação\\n...\",
+  \"mensagem_sugerida\": \"texto com correções aplicadas\"
+}
+
+**Exemplo Completo Corrigido:**
+{
+  \"mensagem\": \"🌟 {{nome}}, como está seu tratamento com Pantogar®? ✨ Estamos aqui para te ajudar! Lembrando que é importante seguir as orientações do seu médico e que o tempo mínimo esperado de tratamento, conforme bula, é de 3 meses. 🎉 Caso necessite adquirir novamente o produto, verifique no site do programa Saúde em Evolução os descontos vigentes no site: 🔗 Acesse aqui Ou compre diretamente: 🛒 Pantogar® - Drogaria São Paulo 📞 Se tiver dúvidas, estamos à disposição. Entre em contato pelo SAC 0800 724 6522 ou envie um e-mail para faleconosco@biolabfarma.com.br.\",
+  \"valido\": false,
+  \"erros\": [\"marketing\", \"emoji_proibido\", \"formato_variavel\"],
+  \"explicacao\": \"1. [marketing] Removida menção a descontos\\n2. [emoji_proibido] 🎉 e 🛒 removidos\\n3. [formato_variavel] {{nome}} mantido\",
+  \"mensagem_sugerida\": \"🌟 {{nome}}, como está seu tratamento com Pantogar®? 🌟 Estamos aqui para te ajudar! Lembrando que é importante seguir as orientações do seu médico e que o tempo mínimo esperado de tratamento, conforme bula, é de 3 meses. Caso necessite adquirir novamente o produto, verifique disponibilidade no programa Saúde em Evolução. 📞 Se tiver dúvidas, estamos à disposição. Entre em contato pelo SAC 0800 724 6522 ou envie um e-mail para faleconosco@biolabfarma.com.br.\"
+}";
     }
 
     private function processResponse(string $responseBody): array
