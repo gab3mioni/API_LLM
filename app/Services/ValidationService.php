@@ -98,13 +98,6 @@ class ValidationService implements ValidationInterface
             $content = $matches[0] ?? $content;
         }
 
-        // Aplica substituição numérica apenas em contexto de texto
-        $content = preg_replace(
-            '/"([^"]*?)\b(\d{1,2})\b(?=\s*meses)([^"]*?)"/u',
-            '"$1{{NÚMERO_EXTENSO}}$3"',
-            $content
-        );
-
         try {
             return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
