@@ -15,7 +15,7 @@ A validação inclui:
 
 ### Requisitos
 
-- PHP 7.4+
+- PHP 8.1+
 - Composer
 - Acesso a uma instância do DeepSeek (local ou remota)
 - Extensão cURL do PHP habilitada
