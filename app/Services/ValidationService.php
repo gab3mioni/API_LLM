@@ -63,19 +63,26 @@ class ValidationService implements ValidationInterface
 
 1. Verifique erros de português
 2. Identifique elementos de marketing e converta para teor utilitário
-3. Avalie uso de emojis conforme diretrizes
-4. Preserve variáveis nos formatos: {{nome}}, {nome} ou #usuario.APELIDO
+3. Avalie uso de emojis conforme diretrizes.
+4. Preserve variáveis nos formatos: {{nome}}
 5. Liste TODOS os erros encontrados
 
-Mensagem: \"$message\"
+**Critérios de Rejeição por Marketing:**
+- Frases de boas-vindas promocionais (ex: \"Seja bem-vindo ao nosso programa!\", \"Aproveite nossa oferta especial!\")
+- Chamadas para ação comerciais (ex: \"Compre agora\", \"Aproveite antes que acabe\")
+- Menção a preços, descontos ou condições comerciais
+- Uso de emojis comerciais proibidos: 🛒🎉🤑💲🚨
+- Qualquer termo que induza engajamento comercial ao invés de informação transacional ou utilitária
 
 **Regras de Validação:**
-- Emojis proibidos: 🛒🎉🤑💲🚨 (tom comercial)
-- Variáveis válidas: {{var}}, {var}, #usuario.APELIDO
-- Números devem permanecer como algarismos (ex: 3, nunca três ou {{NÚMERO_EXTENSO}})
-- Proibir menções a preços/descontos/condições comerciais
+
+- Emojis que reforçarem o caráter comercial devem ser removidos, o resto deve ser mantido para manter a humanização.
+- Variáveis válidas: {{var}}
+- Números devem permanecer como algarismos (ex: 3, nunca três)
 - Termos técnicos com ® devem ser preservados
 - Tom médico-profissional obrigatório
+
+Mensagem: \"$message\"
 
 **Formato de Resposta EXIGIDO (JSON):**
 {
@@ -93,7 +100,8 @@ Mensagem: \"$message\"
   \"explicacao\": \"1. [marketing] Removida menção a descontos\\n2. [emoji_proibido] 🎉 e 🛒 removidos\\n3. [formato_variavel] {{nome}} mantido\",
   \"mensagem_sugerida\": \"🌟 {{nome}}, como está seu tratamento com Pantogar®? 🌟 Estamos aqui para te ajudar! Lembrando que é importante seguir as orientações do seu médico e que o tempo mínimo esperado de tratamento, conforme bula, é de 3 meses. Caso necessite adquirir novamente o produto, verifique disponibilidade no programa Saúde em Evolução. 📞 Se tiver dúvidas, estamos à disposição. Entre em contato pelo SAC 0800 724 6522 ou envie um e-mail para faleconosco@biolabfarma.com.br.\"
 }";
-    }
+}
+
 
     private function processResponse(string $responseBody): array
     {
