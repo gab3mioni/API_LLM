@@ -59,7 +59,22 @@ class ValidationControllerTest extends TestCase
         $analysis = ['valid' => true];
 
         $this->requestMock->method('getParsedBody')->willReturn(['mensagem' => $message]);
-        $this->validatorMock->method('validate')->with($message)->willReturn($analysis);
+        $this->validatorMock->method('validate')
+            ->with($message, null)
+            ->willReturn($analysis);
+
+        $this->streamMock->expects($this->once())
+            ->method('write')
+            ->with(json_encode($analysis));
+
+        $this->responseMock->expects($this->once())
+            ->method('withHeader')
+            ->with('Content-Type', 'application/json')
+            ->willReturnSelf();
+
+        $this->controller->validate($this->requestMock, $this->responseMock);
+    }
+
 
         $this->streamMock->expects($this->once())
             ->method('write')
