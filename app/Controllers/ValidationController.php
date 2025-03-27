@@ -26,7 +26,9 @@ class ValidationController
         }
 
         $message = $data['mensagem'];
-        $analise = $this->validator->validate($message);
+        $buttons = $data['botoes'] ?? null;
+        
+        $analise = $this->validator->validate($message, $buttons);
 
         $response->getBody()->write(json_encode($analise));
         return $response->withHeader('Content-Type', 'application/json');
