@@ -35,7 +35,7 @@ class ValidationService implements ValidationInterface
             return ['erro' => 'Modelo não configurado. Ajuste nas variáveis do ambiente.'];
         }
 
-        $prompt = $this->generatePrompt($message);
+        $prompt = $this->generatePrompt($message, $buttons);
 
         try {
             $response = $this->client->post($this->endpoint, [
@@ -57,7 +57,7 @@ class ValidationService implements ValidationInterface
         }
     }
 
-    private function generatePrompt(string $message): string
+    private function generatePrompt(string $message, ?array $buttons = null): string
     {
         return "Analise a seguinte mensagem para correções ortográficas, gramaticais e validação de compliance. Siga estas etapas CRITICAMENTE:
 
