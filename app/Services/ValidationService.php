@@ -25,7 +25,7 @@ class ValidationService implements ValidationInterface
         $this->model = $model;
     }
 
-    public function validate(string $message): array
+    public function validate(string $message, ?array $buttons = null): array
     {
         if (empty($this->endpoint)) {
             return ['erro' => 'Endpoint não configurado. Ajuste nas variáveis do ambiente.'];
