@@ -75,6 +75,18 @@ class ValidationControllerTest extends TestCase
         $this->controller->validate($this->requestMock, $this->responseMock);
     }
 
+    public function testValidateWithButtonsIncludesThem()
+    {
+        $message = 'Test message';
+        $buttons = ['Sim', 'Não'];
+        $analysis = ['valid' => true, 'botoes_sugeridos' => $buttons];
+
+        $this->requestMock->method('getParsedBody')
+            ->willReturn(['mensagem' => $message, 'botoes' => $buttons]);
+        
+        $this->validatorMock->method('validate')
+            ->with($message, $buttons)
+            ->willReturn($analysis);
 
         $this->streamMock->expects($this->once())
             ->method('write')
