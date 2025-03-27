@@ -59,7 +59,7 @@ class ValidationService implements ValidationInterface
 
     private function generatePrompt(string $message, ?array $buttons = null): string
     {
-        return "Analise a seguinte mensagem para correções ortográficas, gramaticais e validação de compliance. Siga estas etapas CRITICAMENTE:
+        $promptBase = "Analise a seguinte mensagem para correções ortográficas, gramaticais e validação de compliance. Siga estas etapas CRITICAMENTE:
 
 1. Verifique erros de português
 2. Identifique elementos de marketing e converta para teor utilitário
@@ -80,28 +80,40 @@ class ValidationService implements ValidationInterface
 - Variáveis válidas: {{var}}
 - Números devem permanecer como algarismos (ex: 3, nunca três)
 - Termos técnicos com ® devem ser preservados
-- Tom médico-profissional obrigatório
+- Tom médico-profissional obrigatório";
 
-Mensagem: \"$message\"
+        $promptMessage = "Mensagem: \"$message\"";
 
-**Formato de Resposta EXIGIDO (JSON):**
+        // Adicionar conteúdo dos botões ao prompt se existirem
+        $promptButtons = "";
+        if (!empty($buttons)) {
+            $promptButtons = "\n\nBotões:";
+            foreach ($buttons as $index => $button) {
+                $promptButtons .= "\n" . ($index + 1) . ". \"" . $button . "\"";
+            }
+        }
+
+        $promptResponse = "**Formato de Resposta EXIGIDO (JSON):**
 {
   \"valido\": <bool>,
   \"erros\": [\"erro1\", \"erro2\", ...],
   \"explicacao\": \"1. [erro1] explicação\\n2. [erro2] explicação\\n...\",
-  \"mensagem_sugerida\": \"texto com correções aplicadas\"
-}
+  \"mensagem_sugerida\": \"texto com correções aplicadas\"" . 
+  (!empty($buttons) ? ",\n  \"botoes_sugeridos\": [\"botão1\", \"botão2\", ...]" : "") . "
+}";
 
-**Exemplo Completo Corrigido:**
+        $promptExample = "**Exemplo Completo Corrigido:**
 {
   \"mensagem\": \"🌟 {{nome}}, como está seu tratamento com Pantogar®? ✨ Estamos aqui para te ajudar! Lembrando que é importante seguir as orientações do seu médico e que o tempo mínimo esperado de tratamento, conforme bula, é de 3 meses. 🎉 Caso necessite adquirir novamente o produto, verifique no site do programa Saúde em Evolução os descontos vigentes no site: 🔗 Acesse aqui Ou compre diretamente: 🛒 Pantogar® - Drogaria São Paulo 📞 Se tiver dúvidas, estamos à disposição. Entre em contato pelo SAC 0800 724 6522 ou envie um e-mail para faleconosco@biolabfarma.com.br.\",
   \"valido\": false,
   \"erros\": [\"marketing\", \"emoji_proibido\", \"formato_variavel\"],
   \"explicacao\": \"1. [marketing] Removida menção a descontos\\n2. [emoji_proibido] 🎉 e 🛒 removidos\\n3. [formato_variavel] {{nome}} mantido\",
-  \"mensagem_sugerida\": \"🌟 {{nome}}, como está seu tratamento com Pantogar®? 🌟 Estamos aqui para te ajudar! Lembrando que é importante seguir as orientações do seu médico e que o tempo mínimo esperado de tratamento, conforme bula, é de 3 meses. Caso necessite adquirir novamente o produto, verifique disponibilidade no programa Saúde em Evolução. 📞 Se tiver dúvidas, estamos à disposição. Entre em contato pelo SAC 0800 724 6522 ou envie um e-mail para faleconosco@biolabfarma.com.br.\"
+  \"mensagem_sugerida\": \"🌟 {{nome}}, como está seu tratamento com Pantogar®? 🌟 Estamos aqui para te ajudar! Lembrando que é importante seguir as orientações do seu médico e que o tempo mínimo esperado de tratamento, conforme bula, é de 3 meses. Caso necessite adquirir novamente o produto, verifique disponibilidade no programa Saúde em Evolução. 📞 Se tiver dúvidas, estamos à disposição. Entre em contato pelo SAC 0800 724 6522 ou envie um e-mail para faleconosco@biolabfarma.com.br.\"" .
+  (!empty($buttons) ? ",\n  \"botoes_sugeridos\": [\"Sim, gostaria de saber mais\", \"Não, obrigado\"]" : "") . "
 }";
-}
 
+        return $promptBase . "\n\n" . $promptMessage . $promptButtons . "\n\n" . $promptResponse . "\n\n" . $promptExample;
+    }
 
     private function processResponse(string $responseBody): array
     {
