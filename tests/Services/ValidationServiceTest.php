@@ -56,6 +56,22 @@ class ValidationServiceTest extends TestCase
         $this->assertEquals('Teste válido', $result['mensagem_sugerida']);
     }
 
+    public function testRespostaValidaComBotoes(): void
+    {
+        $responseJson = json_encode([
+            'response' => '{"valido": true, "mensagem_sugerida": "Teste válido", "botoes_sugeridos": ["Sim", "Não"]}'
+        ]);
+
+        $this->clientMock->method('post')
+            ->willReturn(new Response(200, [], $responseJson));
+
+        $result = $this->service->validate('mensagem', ['Sim', 'Não']);
+
+        $this->assertTrue($result['valido']);
+        $this->assertEquals('Teste válido', $result['mensagem_sugerida']);
+        $this->assertEquals(['Sim', 'Não'], $result['botoes_sugeridos']);
+    }
+
     public function testRespostaMalFormatada(): void
     {
         $this->clientMock->method('post')
